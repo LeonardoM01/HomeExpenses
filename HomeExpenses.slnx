@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="homeexpenses.client/homeexpenses.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="HomeExpenses.Server/HomeExpenses.Server.csproj" />
+</Solution>
