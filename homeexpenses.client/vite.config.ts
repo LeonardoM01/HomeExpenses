@@ -49,6 +49,7 @@ export default defineConfig({
             // configuração do proxy para redirecionar chamadas de API para o backend ASP.NET Core
             '^/api': {
                 target,
+                changeOrigin: true,
                 secure: false
             }
         },
