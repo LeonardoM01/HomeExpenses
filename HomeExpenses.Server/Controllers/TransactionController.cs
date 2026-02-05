@@ -1,5 +1,6 @@
 ﻿using HomeExpenses.Server.Data;
 using HomeExpenses.Server.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,10 +36,28 @@ namespace HomeExpenses.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Transaction>> CreateTransaction(Transaction transaction)
+        public async Task<ActionResult<TransactionCreateDto>> CreateTransaction(TransactionCreateDto dto)
         {
+            var category = await _context.Categories.FindAsync(dto.CategoryId);
+            if (category == null)
+                return BadRequest("Categoria inválida.");
+
+            var user = await _context.Users.FindAsync(dto.UserId);
+            if (user == null)
+                return BadRequest("Usuário inválido.");
+
+            var transaction = new Transaction
+            {
+                Description = dto.Description,
+                Amount = dto.Value,
+                TransactionType = dto.TransactionType,
+                CategoryId = dto.CategoryId,
+                UserId = dto.UserId
+            };
+
             _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetTransaction), new { id = transaction.Id }, transaction);
         }
     }
