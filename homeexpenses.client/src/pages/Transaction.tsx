@@ -1,8 +1,10 @@
 ﻿import type { Transaction, TransactionType } from '../models/transaction';
 import { TransactionTypeOptions } from '../models/transaction';
+import { CategoryTypeOptions } from '../models/category';
 import { useState, useEffect } from 'react';
 import type { Category } from '../models/category';
 import type { User } from '../models/user';
+import Nav from '../components/Nav';
 
 export default function Transaction() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -11,7 +13,7 @@ export default function Transaction() {
 
     const [formData, setFormData] = useState({
         description: '',
-        value: 0,
+        amount: 0,
         transactionType: 'Revenue' as TransactionType,
         categoryId: 0,
         userId: 0,
@@ -55,7 +57,7 @@ export default function Transaction() {
             } catch (error) {
                 console.error(error);
             }
-        }; 
+        };
 
         fetchTransactions();
         fetchCategories();
@@ -71,14 +73,13 @@ export default function Transaction() {
         const newTransaction: Transaction = {
             id: 0, // O ID será atribuído pelo backend
             description: formData.description,
-            value: formData.value,
+            amount: formData.amount,
             transactionType: formData.transactionType,
             categoryId: formData.categoryId,
             userId: formData.userId,
         };
 
         try {
-            console.log(newTransaction)
             const response = await fetch('/api/transaction', {
                 method: 'POST',
                 headers: {
@@ -97,7 +98,7 @@ export default function Transaction() {
             console.error("Erro ao salvar:", error);
         }
 
-    };   
+    };
 
     // Manipulador de mudança para os campos de entrada
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,91 +115,162 @@ export default function Transaction() {
     };
 
     // Manipulador de mudança para o select de CategoryType
-    const handleTransactionTypeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleTransactionTypeSelect = (
+        e: React.ChangeEvent<HTMLSelectElement>
+    ) => {
         const value = e.target.value;
 
         if (isTransactionType(value)) {
             setFormData(prev => ({
                 ...prev,
-                transactionType: value
+                transactionType: value,
+                categoryId: 0, // limpa categoria selecionada
             }));
         }
     };
 
-  return (
-      <div>
-          <h2>Criar Nova Transação</h2>
-          <form onSubmit={handleSubmit}>
-              <label htmlFor="description">Descrição:</label>
-              <input type="text" id="description" name="description" required value={formData.description} onChange={handleInputChange} />
+    const filteredCategories = categories.filter(
+        (c) => c.categoryType === formData.transactionType
+    );
 
-              <label htmlFor="value">Valor:</label>
-              <input type="number" id="value" name="value" required value={formData.value} onChange={handleInputChange} />
+    return (
+        <div>
+            <Nav />
+            <div className="flex justify-center mt-20">
+                <form className="flex flex-col w-md" onSubmit={handleSubmit}>
+                    <h2 className="mb-4 text-2xl font-bold">
+                        Criar Nova Transação
+                    </h2>
+                    <div className="flex flex-col items-start mb-4 text-lg">
+                        <label htmlFor="description">
+                            Descrição:
+                        </label>
+                        <input
+                            type="text"
+                            id="description"
+                            name="description"
+                            required
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            className="w-full bg-[#393A41] py-1.5 px-3 rounded-md border-1 border-[#3D3E44]"
+                        />
+                    </div>
 
-              <label htmlFor="transactionType">Tipo de Transação:</label>
-              <select id="transactionType" name="categoryType"
-                  value={formData.transactionType}
-                  onChange={handleTransactionTypeSelect}
-              >
-                  {TransactionTypeOptions.map(opt => (
-                      <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                      </option>
-                  ))}
-              </select>
+                    <div className="flex flex-col items-start mb-4 text-lg">
+                        <label htmlFor="TransUser">
+                            Usuário:
+                        </label>
+                        <select
+                            id="TransUser"
+                            name="TransUser"
+                            value={formData.userId}
+                            onChange={(e) =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    userId: Number(e.target.value),
+                                }))
+                            }
+                            className="mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:ring-blue-500"
+                        >
+                            <option className="bg-[#393A41]">Selecione</option>
+                            {users.map((c) => (
+                                <option className="bg-[#393A41]" key={c.id} value={c.id}>
+                                    {c.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-              <label htmlFor="categoryType">Categoria:</label>              
-              <select id="categoryType" name="categoryType"
-                  value={formData.categoryId}
-                  onChange={e =>
-                      setFormData(prev => ({
-                          ...prev,
-                          categoryId: Number(e.target.value),
-                      }))
-                  }
-              >
-                  <option>Selecione</option>
-                  {categories.map(c => (
-                      <option key={c.id} value={c.id}>
-                          {c.description}
-                      </option>
-                  ))}
-              </select>
+                    <div className="flex flex-col items-start mb-4 text-lg">
+                        <label htmlFor="amount">
+                            Valor:
+                        </label>
+                        <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            required
+                            value={formData.amount}
+                            onChange={handleInputChange}
+                            className="w-full bg-[#393A41] py-1.5 px-3 rounded-md border-1 border-[#3D3E44]"
+                        />
+                    </div>
 
-              <label htmlFor="TransUser">Usuário</label>              
-              <select id="TransUser" name="TransUser"
-                  value={formData.userId}
-                  onChange={e =>
-                      setFormData(prev => ({
-                          ...prev,
-                          userId: Number(e.target.value),
-                      }))
-                  }
-              >
-                  <option>Selecione</option>
-                  {users.map(c => (
-                      <option key={c.id} value={c.id}>
-                          {c.name}
-                      </option>
-                  ))}
-              </select>
+                    <div className="flex flex-col items-start mb-4 text-lg">
+                        <label htmlFor="transactionType">
+                            Tipo de Transação:
+                        </label>
+                        <select
+                            id="transactionType"
+                            name="transactionType"
+                            value={formData.transactionType}
+                            onChange={handleTransactionTypeSelect}
+                            className="mt-1 block w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:ring-blue-500"
+                        >
+                            {TransactionTypeOptions.map((opt) => (
+                                <option className="bg-[#393A41]" key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-              <button type="submit">
-                  Adicionar Transação
-              </button>
-          </form>
+                    <div className="flex flex-col items-start mb-4 text-lg">
+                        <label htmlFor="categoryType">
+                            Categoria:
+                        </label>
+                        <select
+                            id="categoryType"
+                            name="categoryType"
+                            value={formData.categoryId}
+                            onChange={(e) =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    categoryId: Number(e.target.value),
+                                }))
+                            }
+                            className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+                        >
+                            <option value={0} className="bg-[#393A41]">
+                                Selecione
+                            </option>
+
+                            {filteredCategories.map((c) => (
+                                <option className="bg-[#393A41]" key={c.id} value={c.id}>
+                                    {c.description}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
 
-          <div >
-              {transactions.map(trs => (
-                  <div key={trs.id} >
-                      <div >
-                          <span>{trs.description}</span>
-                          <span>Idade: {trs.transactionType}</span>
-                      </div>
-                  </div>
-              ))}
-          </div>
-      </div>
-  );
+                    <button
+                        type="submit"
+                        className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-base text-white transition-all shadow-md hover:shadow-lg hover:bg-slate-700 cursor-pointer"
+                    >
+                        Adicionar Transação
+                    </button>
+                </form>
+            </div>
+            <hr className="m-5" />
+            <div className="mt-8 space-y-3">
+                <h2 className="text-2xl font-bold mb-4">
+                    Transações Realizadas
+                </h2>
+                {transactions.map((trs) => (
+                    <div
+                        key={trs.id}
+                        className="border border-gray-200 rounded-md p-4 shadow-sm"
+                    >
+                        <p className="font-medium">{users.find(u => u.id === trs.userId)?.name}</p>
+                        <p className="font-medium">{trs.description}</p>
+                        <p className="font-medium">R$ {trs.amount}</p>
+                        <p className="font-medium">{categories.find(c => c.id === trs.categoryId)?.description}</p>
+                        <p className="font-medium">{TransactionTypeOptions.find(t => t.value === trs.transactionType)?.label.toLowerCase()}</p>
+
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }

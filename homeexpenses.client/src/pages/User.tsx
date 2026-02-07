@@ -1,6 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import type { User } from '../models/user';
+import Nav from '../components/Nav';
 export default function User() {
     const [users, setUsers] = useState<User[]>([]);
     const [formData, setFormData] = useState({
@@ -87,35 +88,54 @@ export default function User() {
 
     return (
         <div>
-            <h2>Criar Novo Usuário</h2>
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="name">Nome:</label>
-                <input type="text" id="name" name="name" required value={formData.name} onChange={handleInputChange} />
+            <Nav />
+            <div className="flex justify-center mt-20">
+                <form className="flex flex-col w-md" onSubmit={handleSubmit}>
+                    <h2 className="mb-4 text-xl">Criar Novo Usuário</h2>
+                    <div className="flex flex-col items-start mb-4 text-lg">
+                        <label htmlFor="name">Nome</label>
+                        <input className="w-full bg-[#393A41] py-1.5 px-3 rounded-md border-1 border-[#3D3E44]" type="text" id="name" name="name" required value={formData.name} onChange={handleInputChange} />
+                    </div>
 
-                <label htmlFor="age">Idade:</label>
-                <input type="number" id="age" name="age" required value={formData.age} onChange={handleInputChange} />
-
-                <button type="submit">
-                    Adicionar Usuário
-                </button>
-            </form>
-
-            <h2>Usuários Cadastrados</h2>
-            {users.length === 0 ? (
-                <p>Nenhum usuário cadastrado ainda.</p>
-            ) : (
-                <div >
-                    {users.map(user => (
-                        <div key={user.id} >
-                            <div >
-                                <span>{user.name}</span>
-                                <span>Idade: {user.age}</span>
-                            </div>
-                            <button onClick={() => handleDeleteUser(user.id)} aria-label={`Deletar usuário ${user.name}`}>Excluir</button>
-                        </div>
-                    ))}
-                </div>
-            )}
+                    <div className="flex flex-col items-start mb-4 text-lg">
+                        <label htmlFor="age">Idade</label>
+                        <input className="w-full bg-[#393A41] py-1.5 px-3 rounded-md border-1 border-[#3D3E44]" type="number" id="age" name="age" required value={formData.age} onChange={handleInputChange} />
+                    </div>
+                    <button className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-base text-white transition-all shadow-md hover:shadow-lg hover:bg-slate-700 cursor-pointer" type="submit">
+                        Adicionar Usuário
+                    </button>
+                </form>
+            </div>
+            <hr className="m-5"></hr>
+            <div className="flex justify-center flex-wrap mx-5">
+                <h2 className="w-full mb-4 text-xl">Usuários Cadastrados</h2>
+                {users.length === 0 ? (
+                    <h2 className="mb-4 text-xl">Nenhum usuário cadastrado ainda.</h2>
+                ) : (
+                    <div className="w-full shadow-xs rounded-md border border-default">
+                        <table className="w-full text-sm">
+                            <thead className="text-sm text-body border-b rounded-base border-default">
+                                <tr className="text-xl">
+                                    <th scope="col" className="px-6 py-3">Nome</th>
+                                    <th scope="col" className="px-6 py-3">Idade</th>
+                                    <th scope="col" className="px-6 py-3">Excluir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map(user => (
+                                    <tr className="border-b border-default text-lg">
+                                        <td scope="row" className="px-6 py-4 text-center">{user.name}</td>
+                                        <td scope="row" className="px-6 py-4 text-center">{user.age}</td>
+                                        <td className="px-6 py-4 text-center"><button
+                                            className="rounded-md bg-red-500 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg hover:bg-red-400 cursor-pointer"
+                                            onClick={() => handleDeleteUser(user.id)} aria-label={`Deletar usuário ${user.name}`}>Excluir Usuário</button></td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

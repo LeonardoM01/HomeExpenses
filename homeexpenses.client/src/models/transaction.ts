@@ -1,4 +1,4 @@
-// Interface de Transação para fazer as requisições
+// Interface de Transaï¿½ï¿½o para fazer as requisiï¿½ï¿½es
 export const TransactionTypeOptions = [
     { value: 'Revenue', label: 'RECEITA' },
     { value: 'Expense', label: 'DESPESA' },
@@ -9,7 +9,7 @@ export type TransactionType =
 export interface Transaction {
     id: number;
     description: string;
-    value: number;
+    amount: number;
     transactionType: TransactionType;
     categoryId: number;
     userId: number;
