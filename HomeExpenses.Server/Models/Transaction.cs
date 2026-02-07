@@ -20,7 +20,7 @@ namespace HomeExpenses.Server.Models
     public class TransactionCreateDto
     {
         public string Description { get; set; } = string.Empty;
-        public decimal Value { get; set; }
+        public decimal Amount { get; set; }
         public TransactionType TransactionType { get; set; }
 
         public int CategoryId { get; set; }

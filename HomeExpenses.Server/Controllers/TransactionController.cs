@@ -49,7 +49,7 @@ namespace HomeExpenses.Server.Controllers
             var transaction = new Transaction
             {
                 Description = dto.Description,
-                Amount = dto.Value,
+                Amount = dto.Amount,
                 TransactionType = dto.TransactionType,
                 CategoryId = dto.CategoryId,
                 UserId = dto.UserId
